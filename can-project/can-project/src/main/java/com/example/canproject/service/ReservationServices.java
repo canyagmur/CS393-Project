@@ -44,15 +44,20 @@ public class ReservationServices {
     @Transactional(rollbackFor = {Exception.class})
     public ReservationInfoDTO save(ReservationDTO reservationDTO) throws Exception {
         Optional<Car> car = carRepository.findById(reservationDTO.getBarcode());
-        List<Equipment> equipments = equipmentRepository.findAllById(reservationDTO.getEquipments());
-        List<Services> services = servicesRepository.findAllById(reservationDTO.getServices());
-        Optional<Member> member = memberRepository.findById(reservationDTO.getMemberId());
         Optional<Location> pickUpLocation = locationRepository.findById(reservationDTO.getPickUpLocation());
+        List<Services> services = servicesRepository.findAllById(reservationDTO.getServices());
         Optional<Location> dropOffLocation = locationRepository.findById(reservationDTO.getDropOffLocation());
 
+        Optional<Member> member = memberRepository.findById(reservationDTO.getMemberId());
+        List<Equipment> equipments = equipmentRepository.findAllById(reservationDTO.getEquipments());
+
+
+
+
         if (car.isEmpty()
+                || reservationDTO.getServices().stream().toList().get(0) != 0 && (reservationDTO.getServices().size() == 1 && services.size() != reservationDTO.getServices().size())
                 || (reservationDTO.getEquipments().size() == 1 && reservationDTO.getEquipments().stream().toList().get(0) != 0 && equipments.size() != reservationDTO.getEquipments().size())
-                || (reservationDTO.getServices().size() == 1 && reservationDTO.getServices().stream().toList().get(0) != 0 && services.size() != reservationDTO.getServices().size())
+
                 || member.isEmpty() || pickUpLocation.isEmpty() || dropOffLocation.isEmpty()) {
             throw new Exception();
         } else {
@@ -62,14 +67,17 @@ public class ReservationServices {
             } else {
                 car.get().setStatus(CarStatus.LOANED);
                 Reservation reservation = new Reservation();
-                reservation.setServices(services);
-                reservation.setEquipments(equipments);
                 reservation.setCar(car.get());
                 reservation.setCreationDate(java.time.LocalDateTime.now());
+                reservation.setEquipments(equipments);
                 reservation.setPickUpDate(java.time.LocalDateTime.now().plusDays(1));
                 reservation.setDropOffDate(java.time.LocalDateTime.now().plusDays(reservationDTO.getDayCount()));
                 reservation.setDropOffLocation(dropOffLocation.get());
                 reservation.setPickUpLocation(pickUpLocation.get());
+                reservation.setServices(services);
+
+
+
                 reservation.setMember(member.get());
                 reservation.setStatus(ReservationStatus.ACTIVE);
                 reservation.setReturnDate(java.time.LocalDateTime.now().plusDays(reservationDTO.getDayCount()));
