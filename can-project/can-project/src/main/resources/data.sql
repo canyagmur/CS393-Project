@@ -1,5 +1,5 @@
 insert into car (barcode,license_plate_number, passenger_capacity, brand, model, mileage, transmission_type, daily_price, type, status) values
-                      (1,'ABC123', 4, 'Toyota', 'Corolla', 10000, 'AUTOMATIC', 50.00, 'STANDARD', 'AVAILABLE')
+                      (1,'SOMELICENSE', 4, 'AUDI', 'A4', 10000, 'AUTOMATIC', 50.00, 'STANDARD', 'AVAILABLE')
 
 
 insert into member values
